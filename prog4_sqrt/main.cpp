@@ -9,7 +9,7 @@
 using namespace ispc;
 
 extern void sqrtSerial(int N, float startGuess, float* values, float* output);
-
+extern void simd_sqrt(int N, float startGuess, float* values, float* output);
 static void verifyResult(int N, float* result, float* gold) {
     for (int i=0; i<N; i++) {
         if (fabs(result[i] - gold[i]) > 1e-4) {
@@ -34,7 +34,9 @@ int main() {
         // to you generate best and worse-case speedups
         
         // starter code populates array with random input values
-        values[i] = .001f + 2.998f * static_cast<float>(rand()) / RAND_MAX;
+        //values[i] = .001f + 2.998f * static_cast<float>(rand()) / RAND_MAX;
+        if(i%8) values[i] = 1.f;
+        else values[i] = 2.999f;
     }
 
     // generate a gold version to check results

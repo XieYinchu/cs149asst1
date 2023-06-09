@@ -12,6 +12,8 @@ typedef struct {
     int* output;
     int threadId;
     int numThreads;
+    int startRow;
+    int numRows;
 } WorkerArgs;
 
 
@@ -22,7 +24,13 @@ extern void mandelbrotSerial(
     int maxIterations,
     int output[]);
 
-
+extern void mandelbrotinterleavedSerial(
+    float x0, float y0, float x1, float y1,
+    int width, int height,
+    int startRow, int step,
+    int maxIterations,
+    int output[]
+);
 //
 // workerThreadStart --
 //
@@ -34,8 +42,13 @@ void workerThreadStart(WorkerArgs * const args) {
     // to compute a part of the output image.  For example, in a
     // program that uses two threads, thread 0 could compute the top
     // half of the image and thread 1 could compute the bottom half.
-
-    printf("Hello world from thread %d\n", args->threadId);
+    double stime = CycleTimer::currentSeconds();
+    mandelbrotinterleavedSerial(args->x0, args->y0, args->x1, args->y1,args->width, args->height, args->threadId, args->numThreads, args->maxIterations, args->output);
+    //mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width, args->height, args->startRow, args->numRows, args->maxIterations, args->output);
+    double etime = CycleTimer::currentSeconds();
+    double traveltime = etime - stime;
+    printf("[thread %d] time used:%.3f ms\n", args->threadId, traveltime*1000);
+    //printf("Hello world from thread %d\n", args->threadId);
 }
 
 //
@@ -60,7 +73,7 @@ void mandelbrotThread(
     // Creates thread objects that do not yet represent a thread.
     std::thread workers[MAX_THREADS];
     WorkerArgs args[MAX_THREADS];
-
+    //int step = height / numThreads;
     for (int i=0; i<numThreads; i++) {
       
         // TODO FOR CS149 STUDENTS: You may or may not wish to modify
@@ -75,7 +88,11 @@ void mandelbrotThread(
         args[i].maxIterations = maxIterations;
         args[i].numThreads = numThreads;
         args[i].output = output;
-      
+
+
+        //args[i].startRow = i * step;
+        //if(i == numThreads-1) args[i].numRows = height - i*step;
+        //else args[i].numRows = step;
         args[i].threadId = i;
     }
 
