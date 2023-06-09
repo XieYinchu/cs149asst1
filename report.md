@@ -1,3 +1,5 @@
+github仓库链接：https://github.com/XieYinchu/cs149asst1
+
 ## program1:Parallel Fractal Generation Using Threads
     实验要求:使用多线程并行实现图像转化,串行方式已经给出,完整并行方式即可.
 
